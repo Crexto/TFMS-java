@@ -5,6 +5,7 @@ import com.tfms.model.entity.User;
 import com.tfms.model.dao.UserDAO;
 import com.tfms.view.LoginPanel;
 import com.tfms.view.MainAppFrame;
+import com.tfms.util.UserSession;
 
 import javax.swing.*;
 
@@ -36,13 +37,15 @@ public class LoginController {
         
         if (user != null) {
             JOptionPane.showMessageDialog(loginView, "Welcome " + user.getUsername() + "!");
-
+            UserSession.setLoggedInUser(user);
+            
             switch (user.getRole()) {
                 case 0: 
                     mainApp.showScreen(MainAppFrame.ADMIN_PANEL); 
                     break;
                 case 1: 
-                    mainApp.showScreen(MainAppFrame.SUPERVISOR_PANEL); 
+                    mainApp.showScreen(MainAppFrame.SUPERVISOR_PANEL);
+                    
                     break;
                 case 2: 
                     mainApp.showScreen(MainAppFrame.QC_PANEL); 

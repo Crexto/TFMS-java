@@ -24,6 +24,8 @@ public class SupervisorPanel extends JPanel {
     private final DefaultTableModel recieptsTableModel;
     
     private JButton RecipetBtn;
+    private JFormattedTextField recipetWeight;
+    private JComboBox<Supplier> suppCombo;
 
     public SupervisorPanel(MainAppFrame app) {
         setLayout(new BorderLayout(10, 10));
@@ -120,17 +122,17 @@ public class SupervisorPanel extends JPanel {
         formatter.setMinimum(0);                
         formatter.setMaximum(1000000);
         
-        JFormattedTextField numberField = new JFormattedTextField(formatter);
-        numberField.setColumns(10);
-        numberField.setValue(0);
+        recipetWeight = new JFormattedTextField(formatter);
+        recipetWeight.setColumns(10);
+        recipetWeight.setValue(0);
         
         SupplierDAO supplierDAO = new SupplierDAO();
         List<Supplier> suppliers = supplierDAO.getAllSuppliers();
 
-        JComboBox<Supplier> suppCombo = new JComboBox<>();
+        suppCombo = new JComboBox<>();
         for (Supplier s : suppliers) {
             suppCombo.addItem(s);
-}
+        }
        
         RecipetBtn = new JButton("Print Reciept");
         
@@ -138,7 +140,7 @@ public class SupervisorPanel extends JPanel {
         formCard.add(suppCombo);
 
         formCard.add(new JLabel("Gross weight (kg):"));
-        formCard.add(numberField);
+        formCard.add(recipetWeight);
 
         formCard.add(new JLabel());
         formCard.add(RecipetBtn);
@@ -153,6 +155,15 @@ public class SupervisorPanel extends JPanel {
         return panel;
     }
     
+    public Supplier getSupplier() {
+        return (Supplier) suppCombo.getSelectedItem();
+    }
+
+    public int getWeight() {
+        Object val = recipetWeight.getValue();
+        return (val != null) ? ((Number) val).intValue() : 0;
+    }
+
     public void LeafCollectionListener(ActionListener listener){
         RecipetBtn.addActionListener(listener);
     }
