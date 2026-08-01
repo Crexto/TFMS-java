@@ -18,6 +18,139 @@ USE `tfms`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `attendance`
+--
+
+DROP TABLE IF EXISTS `attendance`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `attendance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `employee_id` int NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `recorded_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `attendance`
+--
+
+LOCK TABLES `attendance` WRITE;
+/*!40000 ALTER TABLE `attendance` DISABLE KEYS */;
+INSERT INTO `attendance` VALUES (4,'2026-07-31',1,'Absent',4),(5,'2026-07-31',2,'Present',4),(6,'2026-07-31',3,'Absent',4),(7,'2026-08-01',1,'Absent',4),(8,'2026-08-01',2,'Present',4),(9,'2026-08-01',3,'Present',4);
+/*!40000 ALTER TABLE `attendance` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `dispatch_history`
+--
+
+DROP TABLE IF EXISTS `dispatch_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dispatch_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `buyer_name` varchar(20) DEFAULT NULL,
+  `inv_id` int DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dispatch_history`
+--
+
+LOCK TABLES `dispatch_history` WRITE;
+/*!40000 ALTER TABLE `dispatch_history` DISABLE KEYS */;
+INSERT INTO `dispatch_history` VALUES (2,'35',3,1,'2026-07-31 21:53:31'),(3,'hi',1,34,'2026-07-31 22:14:03'),(4,'hi',1,34,'2026-07-31 22:18:27'),(5,'35',1,34,'2026-07-31 22:19:24'),(6,'fa',1,34,'2026-07-31 22:20:07'),(7,'gayer',2,20,'2026-07-31 22:21:17'),(8,'wat',3,200,'2026-08-01 00:43:54');
+/*!40000 ALTER TABLE `dispatch_history` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `downtime`
+--
+
+DROP TABLE IF EXISTS `downtime`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `downtime` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `machine_id` int DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `start_time` time DEFAULT NULL,
+  `end_time` time DEFAULT NULL,
+  `reason` varchar(45) DEFAULT NULL,
+  `remarks` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `downtime`
+--
+
+LOCK TABLES `downtime` WRITE;
+/*!40000 ALTER TABLE `downtime` DISABLE KEYS */;
+INSERT INTO `downtime` VALUES (1,3,'2026-07-31','20:30:00','21:30:46','e','e'),(2,2,'2026-07-31','21:30:00','21:52:00','e','e'),(3,2,'2026-07-31','21:30:00','22:39:00','e','e'),(4,2,'2026-07-31','21:30:00','22:29:00','e','e'),(5,2,'2026-07-31','21:30:00','21:31:00','e','e'),(6,1,'2026-08-01','01:23:05','01:23:05','e','e');
+/*!40000 ALTER TABLE `downtime` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `employees`
+--
+
+DROP TABLE IF EXISTS `employees`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `employees` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `position` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `employees`
+--
+
+LOCK TABLES `employees` WRITE;
+/*!40000 ALTER TABLE `employees` DISABLE KEYS */;
+INSERT INTO `employees` VALUES (1,'sunimal','collector'),(2,'namal','sorter'),(3,'amal','gayer');
+/*!40000 ALTER TABLE `employees` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `inventory`
+--
+
+DROP TABLE IF EXISTS `inventory`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `inventory` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `inventory`
+--
+
+LOCK TABLES `inventory` WRITE;
+/*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
+INSERT INTO `inventory` VALUES (1,'BOP',270),(2,'Dust 1',180),(3,'BOPF',200);
+/*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `leaf_collection`
 --
 
@@ -33,7 +166,7 @@ CREATE TABLE `leaf_collection` (
   PRIMARY KEY (`id`),
   KEY `supplier_id` (`supplier_id`),
   CONSTRAINT `leaf_collection_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,8 +175,90 @@ CREATE TABLE `leaf_collection` (
 
 LOCK TABLES `leaf_collection` WRITE;
 /*!40000 ALTER TABLE `leaf_collection` DISABLE KEYS */;
-INSERT INTO `leaf_collection` VALUES (1,1,30.00,'2026-07-30 03:09:52',4),(2,1,4.00,'2026-07-30 03:12:47',4);
+INSERT INTO `leaf_collection` VALUES (1,1,30.00,'2026-07-30 03:09:52',4),(2,1,4.00,'2026-07-30 03:12:47',4),(3,1,99.00,'2026-07-31 16:15:39',4),(4,1,45.00,'2026-07-31 16:19:27',4),(5,1,34.00,'2026-07-31 19:39:38',4),(6,1,10000.00,'2026-07-31 19:42:41',4);
 /*!40000 ALTER TABLE `leaf_collection` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `machines`
+--
+
+DROP TABLE IF EXISTS `machines`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `machines` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) DEFAULT NULL,
+  `type` varchar(20) DEFAULT NULL,
+  `assigned_emp_id` int DEFAULT NULL,
+  `status` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `machines`
+--
+
+LOCK TABLES `machines` WRITE;
+/*!40000 ALTER TABLE `machines` DISABLE KEYS */;
+INSERT INTO `machines` VALUES (1,'Sorter1','Sorter',2,'Under Maintenance'),(2,'Merger1','Merger',1,'Running'),(3,'Sorter2','Sorter',1,'Running');
+/*!40000 ALTER TABLE `machines` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `production`
+--
+
+DROP TABLE IF EXISTS `production`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `production` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `inv_id` int DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `remarks` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `production`
+--
+
+LOCK TABLES `production` WRITE;
+/*!40000 ALTER TABLE `production` DISABLE KEYS */;
+INSERT INTO `production` VALUES (1,1,'2026-08-01',4,'g'),(2,1,'2026-08-01',100,'g'),(3,3,'2026-08-01',200,'yay');
+/*!40000 ALTER TABLE `production` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stock_history`
+--
+
+DROP TABLE IF EXISTS `stock_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `stock_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `inv_id` int DEFAULT NULL,
+  `transaction_type` varchar(20) DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `balance` int DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stock_history`
+--
+
+LOCK TABLES `stock_history` WRITE;
+/*!40000 ALTER TABLE `stock_history` DISABLE KEYS */;
+INSERT INTO `stock_history` VALUES (1,1,'production',-20,220,'2026-08-01'),(2,1,'Invoice',34,166,'2026-08-01'),(3,1,'Invoice',34,166,'2026-08-01'),(4,1,'Invoice',34,166,'2026-08-01'),(5,1,'Invoice',34,166,'2026-08-01'),(6,2,'Invoice',-20,180,'2026-08-01'),(7,1,'Production',4,170,'2026-08-01'),(8,1,'Production',100,270,'2026-08-01'),(9,3,'Invoice',-200,0,'2026-08-01'),(10,3,'Production',200,200,'2026-08-01');
+/*!40000 ALTER TABLE `stock_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -109,4 +324,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-30 13:18:06
+-- Dump completed on 2026-08-01  8:00:54
