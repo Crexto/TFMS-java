@@ -4,18 +4,34 @@
  */
 package com.tfms.controller;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.Time;
+import java.sql.Date;
+
 import com.tfms.model.entity.LeafCollection;
 import com.tfms.model.entity.User;
 import com.tfms.model.entity.Supplier;
+import com.tfms.model.entity.Attendance;
+import com.tfms.model.entity.Employee;
+import com.tfms.model.entity.Machine;
+import com.tfms.model.dao.LeafCollectionDAO;
+import com.tfms.model.dao.AttendanceDAO;
+import com.tfms.model.dao.MachineDAO;
+import com.tfms.model.dao.DowntimeDAO;
 import com.tfms.util.UserSession;
 import com.tfms.view.SupervisorPanel;
 import com.tfms.view.MainAppFrame;
-import com.tfms.model.dao.LeafCollectionDAO;
 
 
 public class SupervisorController {
     private SupervisorPanel superView;
     private LeafCollectionDAO leafDAO;
+    private AttendanceDAO attendanceDAO;
+    private MachineDAO machineDAO;
+    private DowntimeDAO downtimeDAO;
     private MainAppFrame mainApp;
     
     
@@ -23,9 +39,14 @@ public class SupervisorController {
         this.superView = superView;
         this.mainApp = mainApp;
         this.leafDAO = new LeafCollectionDAO();
+        this.attendanceDAO = new AttendanceDAO();
+        this.machineDAO = new MachineDAO();
+        this.downtimeDAO = new DowntimeDAO();
         
-        
+        this.superView.AttendanceListener(e -> handleAttendance());
         this.superView.LeafCollectionListener(e -> handleLeafCollection());
+        this.superView.MachineListener(e -> handleMachine());
+        this.superView.addSaveDowntimeListener(e -> handleDowntime());
        
     }
     
@@ -66,5 +87,124 @@ public class SupervisorController {
         } else {
             JOptionPane.showMessageDialog(superView, "Failed to save record to database.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    
+    private void handleAttendance() { 
+        User user = UserSession.getLoggedInUser();
+        LocalDate date = LocalDate.now();
+        
+        boolean todayAtt = attendanceDAO.validateAttendance(date);
+        
+        if (todayAtt) {
+            JOptionPane.showMessageDialog(superView, "Attendance for today has already been recorded.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String confirmMessage = String.format("Are you sure you want to submit this record?");
+
+        int confirmResult = JOptionPane.showConfirmDialog(
+            superView,
+            confirmMessage,
+            "Confirm Attendance Record",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmResult != JOptionPane.YES_OPTION) {
+            return;
+        }
+        
+        DefaultTableModel att = superView.getAttendanceTable();
+        for (int viewRow = 0; viewRow < att.getRowCount(); viewRow++) {
+  
+            Object idObj = att.getValueAt(viewRow, 0);
+            Object statusObj = att.getValueAt(viewRow, 3); 
+
+            int empId = (int) idObj;
+            
+            String status = (String) statusObj;
+
+            if ("-".equals(status)) {
+                status = "Absent";
+            }
+            
+            Attendance attendance = new Attendance(date, empId, status, user.getId());
+            attendanceDAO.attendanceInsert(attendance);
+
+        }
+        
+        JOptionPane.showMessageDialog(superView, "Attendance saved successfully!");
+    }
+    
+    
+    private void handleMachine() { 
+        
+        List<Object[]> machinesOld = machineDAO.getAllMachines();
+        DefaultTableModel machinesNew = superView.getMachineTable();
+        
+        String confirmMessage = String.format("Are you sure you want to update this record?");
+
+        int confirmResult = JOptionPane.showConfirmDialog(
+            superView,
+            confirmMessage,
+            "Confirm Machine Management Record",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmResult != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int updatedCount = 0;
+
+        for (int row = 0; row < machinesNew.getRowCount(); row++) {
+            Employee newEmployee = (Employee) machinesNew.getValueAt(row, 3);
+            Employee oldEmployee = (Employee) machinesOld.get(row)[3];
+            
+            if (newEmployee.getId() != oldEmployee.getId() || !machinesNew.getValueAt(row, 4).equals((String) machinesOld.get(row)[4])){
+                boolean updated = machineDAO.updateMachine((int)machinesNew.getValueAt(row, 0), newEmployee.getId(),(String) machinesNew.getValueAt(row, 4));
+                if (updated) {
+                    updatedCount++;
+                }
+            }  
+     
+        }
+
+        JOptionPane.showMessageDialog(superView, "Updated " + updatedCount + " machines successfully!");
+     
+    }
+    
+    private void handleDowntime() {
+        
+        Machine machine = superView.getSelectedMachine();
+        Date date = new Date(superView.getDowntimeDate().getTime());
+        Time startTime = new Time(superView.getStartTime().getTime());
+        Time endTime = new Time(superView.getEndTime().getTime());
+        String reason = superView.getReason();
+        String remarks = superView.getRemarks();
+
+        if (reason.isEmpty()) {
+            JOptionPane.showMessageDialog(superView, "Please enter a reason for the downtime.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (endTime.before(startTime)) {
+            JOptionPane.showMessageDialog(superView, "End time cannot be earlier than start time.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        
+        boolean success = downtimeDAO.downtimeLog(machine.getId(), date, startTime, endTime, reason, remarks);
+        machineDAO.setMachineDown(machine.getId());
+
+        if (success) {
+            JOptionPane.showMessageDialog(superView, "Downtime logged successfully!");
+
+        } else {
+            JOptionPane.showMessageDialog(superView, "Failed to log downtime.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return;
     }
 }

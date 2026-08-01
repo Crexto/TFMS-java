@@ -8,6 +8,7 @@ public class LeafCollection {
     private Date collectionDate;
     private int receipt;
     private int recorded_by;
+    private String supplier_name;
     
     public LeafCollection(int supplier, int gross_weight, int recorded_by) {
         this.supplier = supplier;
@@ -15,9 +16,10 @@ public class LeafCollection {
         this.recorded_by = recorded_by;
     }
 
-    public LeafCollection(int id, int supplier, Date collection_date, int gross_weight, int recorded_by) {
+    public LeafCollection(int id, int supplier, String supplier_name, Date collection_date, int gross_weight, int recorded_by) {
         this(supplier,gross_weight,recorded_by);
         this.id = id;
+        this.supplier_name = supplier_name;
         this.collectionDate = collection_date;
 
     }

@@ -2,6 +2,7 @@
 package com.tfms.view;
 import com.tfms.controller.LoginController;
 import com.tfms.controller.SupervisorController;
+import com.tfms.controller.ManagerController;
 import javax.swing.*;
 import java.awt.*;
 
@@ -33,9 +34,12 @@ public class MainAppFrame extends JFrame {
         SupervisorPanel superPanel = new SupervisorPanel(this);
         new SupervisorController(superPanel, this);
         
+        ManagerPanel manaPanel = new ManagerPanel(this);
+        new ManagerController(manaPanel, this);
+        
         mainContainer.add(loginPanel, LOGIN_PANEL);        
         mainContainer.add(new AdminPanel(this), ADMIN_PANEL);        
-        mainContainer.add(new ManagerPanel(this), MANAGER_PANEL);
+        mainContainer.add(manaPanel, MANAGER_PANEL);
         mainContainer.add(superPanel, SUPERVISOR_PANEL);
 
 
