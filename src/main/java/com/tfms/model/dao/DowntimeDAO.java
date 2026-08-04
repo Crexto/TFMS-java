@@ -5,7 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class DowntimeDAO {
@@ -30,5 +33,30 @@ public class DowntimeDAO {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    public List<Object[]> getAllDowntime() {
+        List<Object[]> rows = new ArrayList<>();
+        String sql = "SELECT m.name, d.date, d.start_time, d.end_time, d.reason, d.remarks FROM machines m JOIN downtime d ON d.machine_id = m.id";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    rows.add(new Object[]{
+                        rs.getString("name"),
+                        rs.getDate("date"),
+                        rs.getTime("start_time"),
+                        rs.getTime("end_time"),
+                        rs.getString("reason"),
+                        rs.getString("remarks")
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
     }
 }

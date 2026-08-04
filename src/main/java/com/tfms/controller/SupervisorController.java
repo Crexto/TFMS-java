@@ -17,36 +17,51 @@ import com.tfms.model.entity.Supplier;
 import com.tfms.model.entity.Attendance;
 import com.tfms.model.entity.Employee;
 import com.tfms.model.entity.Machine;
+import com.tfms.model.dao.ProductionDAO;
+import com.tfms.model.dao.SupplierDAO;
+import com.tfms.model.dao.InventoryDAO;
+import com.tfms.model.dao.DowntimeDAO;
 import com.tfms.model.dao.LeafCollectionDAO;
 import com.tfms.model.dao.AttendanceDAO;
 import com.tfms.model.dao.MachineDAO;
-import com.tfms.model.dao.DowntimeDAO;
+import com.tfms.model.dao.EmployeeDAO;
 import com.tfms.util.UserSession;
 import com.tfms.view.SupervisorPanel;
 import com.tfms.view.MainAppFrame;
 
 
 public class SupervisorController {
-    private SupervisorPanel superView;
-    private LeafCollectionDAO leafDAO;
-    private AttendanceDAO attendanceDAO;
-    private MachineDAO machineDAO;
-    private DowntimeDAO downtimeDAO;
-    private MainAppFrame mainApp;
+    private final SupervisorPanel superView;
+    private final LeafCollectionDAO leafDAO;
+    private final InventoryDAO invDAO;
+    private final SupplierDAO supplierDAO;
+    private final ProductionDAO productionDAO;
+    private final DowntimeDAO downtimeDAO;
+    private final AttendanceDAO attendanceDAO;
+    private final MachineDAO machineDAO;    
+    private final EmployeeDAO employeeDAO;
+    private final MainAppFrame mainApp;
     
     
     public SupervisorController(SupervisorPanel superView, MainAppFrame mainApp){
         this.superView = superView;
         this.mainApp = mainApp;
+        this.invDAO = new InventoryDAO();
+        this.supplierDAO = new SupplierDAO();
+        this.productionDAO = new ProductionDAO();        
+        this.downtimeDAO = new DowntimeDAO();
         this.leafDAO = new LeafCollectionDAO();
         this.attendanceDAO = new AttendanceDAO();
         this.machineDAO = new MachineDAO();
-        this.downtimeDAO = new DowntimeDAO();
+        this.employeeDAO = new EmployeeDAO();
         
         this.superView.AttendanceListener(e -> handleAttendance());
         this.superView.LeafCollectionListener(e -> handleLeafCollection());
         this.superView.MachineListener(e -> handleMachine());
         this.superView.addSaveDowntimeListener(e -> handleDowntime());
+        this.superView.RefreshListener(e -> refreshAllTables());
+        
+        refreshAllTables();
        
     }
     
@@ -84,6 +99,7 @@ public class SupervisorController {
 
         if (success) {
             JOptionPane.showMessageDialog(superView, "Leaf collection record saved successfully!");
+            refreshAllTables();
         } else {
             JOptionPane.showMessageDialog(superView, "Failed to save record to database.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -133,7 +149,7 @@ public class SupervisorController {
             attendanceDAO.attendanceInsert(attendance);
 
         }
-        
+        refreshAllTables();
         JOptionPane.showMessageDialog(superView, "Attendance saved successfully!");
     }
     
@@ -171,7 +187,7 @@ public class SupervisorController {
             }  
      
         }
-
+        refreshAllTables();
         JOptionPane.showMessageDialog(superView, "Updated " + updatedCount + " machines successfully!");
      
     }
@@ -201,10 +217,47 @@ public class SupervisorController {
 
         if (success) {
             JOptionPane.showMessageDialog(superView, "Downtime logged successfully!");
+            refreshAllTables();
 
         } else {
             JOptionPane.showMessageDialog(superView, "Failed to log downtime.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
         return;
+    }
+    
+    private void refreshAllTables() {
+
+        superView.loadAttendanceData(employeeDAO.getAllEmployees());
+
+        superView.loadAttendanceHistory(attendanceDAO.getAllAttendance());
+
+        superView.loadMachineData(machineDAO.getAllMachines());
+
+        superView.loadReceiptRecords(leafDAO.getAllReciepts());
+
+        superView.setSuppliers(supplierDAO.getAllSuppliers());
+        
+        superView.setEmployees(employeeDAO.getAllEmployees());
+        
+        superView.setMachines(machineDAO.getAllClassMachines());
+
+        refreshDashboard();
+    }
+    
+    private void refreshDashboard() {
+
+        int leavesToday = leafDAO.getLeavesToday();
+        double productionToday = productionDAO.getProductionToday();
+        double totalStock = invDAO.getTotal();
+
+        int pendingQC = 2;
+        int rejectedBatches = 0;
+
+        int runningMachines = machineDAO.getRunningMachines();
+        int maintenanceMachines = machineDAO.getDownMachines();
+
+        int workersPresent = attendanceDAO.getAllPresent();
+
+        superView.updateDashboard(leavesToday, productionToday, totalStock, pendingQC, rejectedBatches, runningMachines, maintenanceMachines, workersPresent);
     }
 }

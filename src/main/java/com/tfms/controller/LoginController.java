@@ -38,6 +38,7 @@ public class LoginController {
         if (user != null) {
             JOptionPane.showMessageDialog(loginView, "Welcome " + user.getUsername() + "!");
             UserSession.setLoggedInUser(user);
+            loginView.clearFields();
             
             switch (user.getRole()) {
                 case 0: 

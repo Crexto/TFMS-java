@@ -2,47 +2,44 @@ package com.tfms.view;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.util.EventObject;
-import javax.swing.RowFilter;
 import javax.swing.table.TableRowSorter;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.EventObject;
+import java.util.List;
 
-import com.tfms.model.dao.SupplierDAO;
-import com.tfms.model.dao.EmployeeDAO;
-import com.tfms.model.dao.AttendanceDAO;
-import com.tfms.model.dao.MachineDAO;
-import com.tfms.model.dao.LeafCollectionDAO;
 import com.tfms.model.entity.Supplier;
 import com.tfms.model.entity.Employee;
 import com.tfms.model.entity.Machine;
-import java.text.NumberFormat;
-import javax.swing.text.NumberFormatter;
-import java.awt.event.ActionListener;
 
 public class SupervisorPanel extends JPanel {
 
     private final DefaultTableModel attendanceTableModel;   
     private final DefaultTableModel attendanceHTableModel;
     private final DefaultTableModel machineManageTableModel;
-    private final DefaultTableModel recieptsTableModel;
+    private final DefaultTableModel receiptsTableModel;
      
-    private final SupplierDAO supplierDAO = new SupplierDAO();
-    private final EmployeeDAO employeeDAO = new EmployeeDAO();
-    private final AttendanceDAO attendanceDAO = new AttendanceDAO();
-    private final MachineDAO machineDAO = new MachineDAO();
-    private final LeafCollectionDAO leafDAO = new LeafCollectionDAO();
+    private JLabel todayLeavesLabel;
+    private JLabel todayProductionLabel;
+    private JLabel finalStockLabel;
+    private JLabel pendingQCLabel;
+    private JLabel rejectedBatchLabel;
+    private JLabel runningMachineLabel;
+    private JLabel maintenanceMachineLabel;
+    private JLabel workersPresentLabel;
     
-    private JButton RecipetBtn;
-    private JButton AttendanceBtn;
+    private JButton receiptBtn;
+    private JButton refreshBtn;
+    private JButton attendanceBtn;
     private JButton machineSaveBtn;
-    private JFormattedTextField recipetWeight;
+    private JFormattedTextField receiptWeight;
     private JComboBox<Supplier> suppCombo;
     private JComboBox<Machine> machineCombo;
+    private JComboBox<Employee> employeeComboBox;
     private JSpinner startTime;
     private JSpinner endTime;
     private JTextField reason;
@@ -58,11 +55,18 @@ public class SupervisorPanel extends JPanel {
         JLabel title = new JLabel("Supervisor Dashboard");
         title.setFont(new Font("SansSerif", Font.BOLD, 18));
         
-        JButton logout = new JButton("Logout");
-        logout.addActionListener(e -> app.showScreen(MainAppFrame.LOGIN_PANEL));
+        JPanel rightHeader = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        refreshBtn = new JButton("Refresh All"); 
+        JButton logoutBtn = new JButton("Logout");
         
+        logoutBtn.addActionListener(e -> app.showScreen(MainAppFrame.LOGIN_PANEL));
+
+        rightHeader.add(refreshBtn);
+        rightHeader.add(logoutBtn);
+
         header.add(title, BorderLayout.WEST);
-        header.add(logout, BorderLayout.EAST);
+        header.add(rightHeader, BorderLayout.EAST);       
+
         add(header, BorderLayout.NORTH);
 
         JTabbedPane tabbedPane = new JTabbedPane();
@@ -86,7 +90,7 @@ public class SupervisorPanel extends JPanel {
                 return false; 
             }
         };
-        recieptsTableModel = new DefaultTableModel(new String[]{"Date", "Receipt No.", "Supplier ID", "Supplier Name", "Weight (kg)"}, 0) {
+        receiptsTableModel = new DefaultTableModel(new String[]{"Date", "Receipt No.", "Supplier ID", "Supplier Name", "Weight (kg)"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; 
@@ -99,28 +103,38 @@ public class SupervisorPanel extends JPanel {
         tabbedPane.addTab("Attendance Records", createAttendanceRecordsTab());
         tabbedPane.addTab("Machine Management", createMachineManagementTab());
         tabbedPane.addTab("Log Downtime", createLogDowntimeTab());        
-        tabbedPane.addTab("Receipts", createRecieptRecordsTab());
+        tabbedPane.addTab("Receipts", createReceiptRecordsTab());
 
         add(tabbedPane, BorderLayout.CENTER);
     }
-    
     
     private JPanel createDashboardTab() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel formCard = new JPanel(new GridLayout(10, 1, 10, 15));
+        JPanel formCard = new JPanel(new GridLayout(8, 1, 10, 15));
         formCard.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createTitledBorder("Dashboard"),
             BorderFactory.createEmptyBorder(10, 15, 10, 10) 
         ));
-     
-        formCard.add(new JLabel("Today's Green Leaf Collection : "+String.format("%,d", leafDAO.getLeavesToday())+" kg"));
-        formCard.add(new JLabel("Pending QC Batches : 3")); 
-        formCard.add(new JLabel("Rejected Batches : 1"));
-        formCard.add(new JLabel("Machines Running : "+machineDAO.getRunningMachines()));       
-        formCard.add(new JLabel("Machines Under Maintenance : "+machineDAO.getDownMachines()));        
-        formCard.add(new JLabel("Workers Present : "+attendanceDAO.getAllPresent()));
+        
+        todayLeavesLabel = new JLabel();
+        todayProductionLabel = new JLabel();
+        finalStockLabel = new JLabel();
+        pendingQCLabel = new JLabel();
+        rejectedBatchLabel = new JLabel();
+        runningMachineLabel = new JLabel();
+        maintenanceMachineLabel = new JLabel();
+        workersPresentLabel = new JLabel();
+
+        formCard.add(todayLeavesLabel);
+        formCard.add(todayProductionLabel);
+        formCard.add(finalStockLabel);
+        formCard.add(pendingQCLabel);
+        formCard.add(rejectedBatchLabel);
+        formCard.add(runningMachineLabel);
+        formCard.add(maintenanceMachineLabel);
+        formCard.add(workersPresentLabel); 
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0;
@@ -142,36 +156,19 @@ public class SupervisorPanel extends JPanel {
             BorderFactory.createEmptyBorder(10, 15, 10, 10) 
         ));
         
-        NumberFormat format = NumberFormat.getInstance();
-        format.setGroupingUsed(false);
+        receiptWeight = createNumberFormattedField();
         
-        NumberFormatter formatter = new NumberFormatter(format);
-        formatter.setValueClass(Integer.class); 
-        formatter.setAllowsInvalid(false);      
-        formatter.setMinimum(0);                
-        formatter.setMaximum(1000000);
-        
-        recipetWeight = new JFormattedTextField(formatter);
-        recipetWeight.setColumns(10);
-        recipetWeight.setValue(0);
-        
-        List<Supplier> suppliers = supplierDAO.getAllSuppliers();
-
         suppCombo = new JComboBox<>();
-        for (Supplier s : suppliers) {
-            suppCombo.addItem(s);
-        }
-       
-        RecipetBtn = new JButton("Print Receipt");
+        receiptBtn = new JButton("Print Receipt");
         
         formCard.add(new JLabel("Supplier:"));
         formCard.add(suppCombo);
 
         formCard.add(new JLabel("Gross weight (kg):"));
-        formCard.add(recipetWeight);
+        formCard.add(receiptWeight);
 
         formCard.add(new JLabel());
-        formCard.add(RecipetBtn);
+        formCard.add(receiptBtn);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 0;
@@ -181,19 +178,6 @@ public class SupervisorPanel extends JPanel {
         panel.add(formCard, gbc);
 
         return panel;
-    }
-    
-    public Supplier getSupplier() {
-        return (Supplier) suppCombo.getSelectedItem();
-    }
-
-    public int getWeight() {
-        Object val = recipetWeight.getValue();
-        return (val != null) ? ((Number) val).intValue() : 0;
-    }
-
-    public void LeafCollectionListener(ActionListener listener){
-        RecipetBtn.addActionListener(listener);
     }
 
     private JPanel createAttendanceTab() {
@@ -207,27 +191,23 @@ public class SupervisorPanel extends JPanel {
 
         JTextField searchField = new JTextField(10);
         JButton filterBtn = new JButton("Filter");
-        JButton refreshBtn = new JButton("Refresh");
 
         filterPanel.add(new JLabel("Search:"));
         filterPanel.add(searchField);
         filterPanel.add(filterBtn);
-        filterPanel.add(refreshBtn);
 
         JTable attendanceTable = new JTable(attendanceTableModel);
         attendanceTable.setRowHeight(28);
         
-        Runnable loadData = () -> {
-            attendanceTableModel.setRowCount(0);
-            
-            List<Employee> employees = employeeDAO.getAllEmployees();
-            for (Employee e : employees) {
-                attendanceTableModel.addRow(new Object[]{e.getId(), e.getName(), e.getPosition(), "-"});
-            }
-        };
-        loadData.run();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(attendanceTableModel);
+        attendanceTable.setRowSorter(sorter);
 
-        refreshBtn.addActionListener(e -> loadData.run());
+        filterBtn.addActionListener(e -> applyFilter(sorter, searchField.getText(), null, false, null));
+
+//        refreshBtn.addActionListener(e -> {
+//            searchField.setText("");
+//            sorter.setRowFilter(null);
+//        });
 
         JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Present", "Absent"});
         
@@ -241,30 +221,17 @@ public class SupervisorPanel extends JPanel {
         attendanceTable.getColumnModel().getColumn(3).setCellEditor(singleClickEditor);
 
         JScrollPane scrollPane = new JScrollPane(attendanceTable);
-        
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(attendanceTableModel);
-        attendanceTable.setRowSorter(sorter);
-
-        filterBtn.addActionListener(e -> filterTable(sorter, searchField.getText().trim()));
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        AttendanceBtn = new JButton("Save Attendance");
+        attendanceBtn = new JButton("Save Attendance");
         
-        bottomPanel.add(AttendanceBtn);
+        bottomPanel.add(attendanceBtn);
         
         panel.add(filterPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
         return panel;
-    }
-    
-    public void AttendanceListener(ActionListener listener){
-        AttendanceBtn.addActionListener(listener);
-    }
-    
-    public DefaultTableModel getAttendanceTable() {
-        return attendanceTableModel;
     }
 
     private JPanel createAttendanceRecordsTab() {
@@ -282,68 +249,48 @@ public class SupervisorPanel extends JPanel {
         JTextField searchField = new JTextField(10);
         JComboBox<String> attendanceComboFilter = new JComboBox<>(new String[]{"All", "Present", "Absent"});
 
+        JCheckBox useDateFilter = new JCheckBox("Filter Date:");
         SpinnerDateModel dateModel = new SpinnerDateModel();
-        JSpinner dateSpinnerFilter = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinnerFilter, "yyyy-MM-dd");
-        dateSpinnerFilter.setEditor(dateEditor);
+        JSpinner attendanceDateSpinner = new JSpinner(dateModel);
+        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(attendanceDateSpinner, "yyyy-MM-dd");
+        attendanceDateSpinner.setEditor(dateEditor);
         dateEditor.getTextField().setColumns(8);
+        attendanceDateSpinner.setEnabled(false);
+
+        useDateFilter.addActionListener(e -> attendanceDateSpinner.setEnabled(useDateFilter.isSelected()));
 
         JButton filterBtn = new JButton("Filter");
-        JButton refreshBtn = new JButton("Refresh");
 
         filterPanel.add(new JLabel("Search:"));
         filterPanel.add(searchField);
         filterPanel.add(new JLabel("Status:"));
         filterPanel.add(attendanceComboFilter);
-        filterPanel.add(new JLabel("Date:"));
-        filterPanel.add(dateSpinnerFilter);
+        filterPanel.add(useDateFilter);
+        filterPanel.add(attendanceDateSpinner);
         filterPanel.add(filterBtn);
-        filterPanel.add(refreshBtn);
 
         JTable historyTable = new JTable(attendanceHTableModel);
         historyTable.setRowHeight(24);
         JScrollPane scrollPane = new JScrollPane(historyTable);
         
-        Runnable loadData = () -> {
-            attendanceHTableModel.setRowCount(0);
-            
-            List<Object[]> attendance = attendanceDAO.getAllAttendance();
-            for (Object[] a : attendance) {
-                attendanceHTableModel.addRow(a);
-            }
-        };
-        loadData.run();
-
-        refreshBtn.addActionListener(e -> loadData.run());
-
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(attendanceHTableModel);
         historyTable.setRowSorter(sorter);
 
-        filterBtn.addActionListener(e -> {
-            List<RowFilter<Object, Object>> filters = new ArrayList<>();
-
-            String searchTxt = searchField.getText().trim();
-            if (!searchTxt.isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + searchTxt));
-            }
-
-            String grade = (String) attendanceComboFilter.getSelectedItem();
-            if (grade != null && !grade.equals("All")) {
-                filters.add(RowFilter.regexFilter("(?i)" + grade));
-            }
-
-            SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-            String formattedDate = dateFmt.format(dateSpinnerFilter.getValue());
-            if (!formattedDate.isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + formattedDate));
-            }
-
-            if (filters.isEmpty()) {
-                sorter.setRowFilter(null);
-            } else {
-                sorter.setRowFilter(RowFilter.andFilter(filters));
-            }
-        });
+        filterBtn.addActionListener(e -> applyFilter(
+            sorter, 
+            searchField.getText(), 
+            (String) attendanceComboFilter.getSelectedItem(), 
+            useDateFilter.isSelected(), 
+            attendanceDateSpinner.getValue()
+        ));
+//
+//        refreshBtn.addActionListener(e -> {
+//            searchField.setText("");
+//            attendanceComboFilter.setSelectedIndex(0);
+//            useDateFilter.setSelected(false);
+//            attendanceDateSpinner.setEnabled(false);
+//            sorter.setRowFilter(null);
+//        });
 
         containerPanel.add(filterPanel, BorderLayout.NORTH);
         containerPanel.add(scrollPane, BorderLayout.CENTER);
@@ -364,60 +311,40 @@ public class SupervisorPanel extends JPanel {
 
         JTextField searchField = new JTextField(10);
         JButton filterBtn = new JButton("Filter");
-        JButton refreshBtn = new JButton("Refresh");
 
         filterPanel.add(new JLabel("Search:"));
         filterPanel.add(searchField);
         filterPanel.add(filterBtn);
-        filterPanel.add(refreshBtn);
 
         JTable machineTable = new JTable(machineManageTableModel);
         machineTable.setRowHeight(28);
         
-        Runnable loadData = () -> {
-            machineManageTableModel.setRowCount(0);
-            
-            List<Object[]> machines = machineDAO.getAllMachines();
-            for (Object[] m : machines) {
-                machineManageTableModel.addRow(m);
-            }
-        };
-        loadData.run();
-
-        refreshBtn.addActionListener(e -> loadData.run());
-
-        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Running", "Under Maintenance", "Idle"});
-        
-        JComboBox<Employee> employeeComboBox = new JComboBox<>();
-        
-        List<Employee> employees = employeeDAO.getAllEmployees();
-
-        for (Employee e : employees) {
-            employeeComboBox.addItem(e);
-        }
-        
-        DefaultCellEditor singleClickEditor = new DefaultCellEditor(statusComboBox) {
-            @Override
-            public boolean isCellEditable(EventObject e) {
-                return true;
-            }
-        };
-        DefaultCellEditor singleClickEditor2 = new DefaultCellEditor(employeeComboBox) {
-            @Override
-            public boolean isCellEditable(EventObject e) {
-                return true;
-            }
-        };
-        
-        machineTable.getColumnModel().getColumn(4).setCellEditor(singleClickEditor);
-        machineTable.getColumnModel().getColumn(3).setCellEditor(singleClickEditor2);
-
-        JScrollPane scrollPane = new JScrollPane(machineTable);
-        
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(machineManageTableModel);
         machineTable.setRowSorter(sorter);
 
-        filterBtn.addActionListener(e -> filterTable(sorter, searchField.getText().trim()));
+        filterBtn.addActionListener(e -> applyFilter(sorter, searchField.getText(), null, false, null));
+
+
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Running", "Under Maintenance", "Idle"});
+        employeeComboBox = new JComboBox<>();
+        
+        DefaultCellEditor statusEditor = new DefaultCellEditor(statusComboBox) {
+            @Override
+            public boolean isCellEditable(EventObject e) {
+                return true;
+            }
+        };
+        DefaultCellEditor employeeEditor = new DefaultCellEditor(employeeComboBox) {
+            @Override
+            public boolean isCellEditable(EventObject e) {
+                return true;
+            }
+        };
+        
+        machineTable.getColumnModel().getColumn(4).setCellEditor(statusEditor);
+        machineTable.getColumnModel().getColumn(3).setCellEditor(employeeEditor);
+
+        JScrollPane scrollPane = new JScrollPane(machineTable);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         machineSaveBtn = new JButton("Save");
@@ -429,14 +356,6 @@ public class SupervisorPanel extends JPanel {
         panel.add(bottomPanel, BorderLayout.SOUTH);
         
         return panel;
-    }
-      
-    public void MachineListener(ActionListener listener){
-        machineSaveBtn.addActionListener(listener);
-    }
-    
-    public DefaultTableModel getMachineTable() {
-        return machineManageTableModel;
     }
 
     private JPanel createLogDowntimeTab() {
@@ -466,13 +385,6 @@ public class SupervisorPanel extends JPanel {
         dateEditor.getTextField().setColumns(8);
 
         machineCombo = new JComboBox<>();
-        
-        List<Machine> machines = machineDAO.getAllClassMachines();
-
-        for (Machine m : machines) {
-            machineCombo.addItem(m);
-        }
-
         reason = new JTextField(10);
         remarks = new JTextField(10);
         saveDown = new JButton("Save Downtime");
@@ -508,7 +420,216 @@ public class SupervisorPanel extends JPanel {
 
         return panel;
     }
+
+    private JPanel createReceiptRecordsTab() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel containerPanel = new JPanel(new BorderLayout(5, 5));
+        containerPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder("Receipt Records"),
+            BorderFactory.createEmptyBorder(10, 15, 10, 15)
+        ));
+
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JTextField searchField = new JTextField(10);
+
+        JCheckBox useDateFilter = new JCheckBox("Filter Date:");
+        JSpinner receiptDateSpinner = new JSpinner(new SpinnerDateModel());
+        receiptDateSpinner.setEditor(new JSpinner.DateEditor(receiptDateSpinner, "yyyy-MM-dd"));
+        receiptDateSpinner.setEnabled(false);
+
+        useDateFilter.addActionListener(e -> receiptDateSpinner.setEnabled(useDateFilter.isSelected()));
+
+        JButton filterBtn = new JButton("Filter");
+
+        filterPanel.add(new JLabel("Search:"));
+        filterPanel.add(searchField);
+        filterPanel.add(useDateFilter);
+        filterPanel.add(receiptDateSpinner);
+        filterPanel.add(filterBtn);
+
+        JTable historyTable = new JTable(receiptsTableModel);
+        historyTable.setRowHeight(24);
+        JScrollPane scrollPane = new JScrollPane(historyTable);
+        
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(receiptsTableModel);
+        historyTable.setRowSorter(sorter);
+        
+        filterBtn.addActionListener(e -> applyFilter(sorter, searchField.getText(), null, useDateFilter.isSelected(), receiptDateSpinner.getValue()));
+
+        containerPanel.add(filterPanel, BorderLayout.NORTH);
+        containerPanel.add(scrollPane, BorderLayout.CENTER);
+
+        panel.add(containerPanel, BorderLayout.CENTER);
+
+        return panel;
+    }
     
+    private JFormattedTextField createNumberFormattedField() {
+        NumberFormat format = NumberFormat.getInstance();
+        format.setGroupingUsed(false);
+
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setAllowsInvalid(false);
+        formatter.setMinimum(0);
+        formatter.setMaximum(1000000);
+
+        JFormattedTextField field = new JFormattedTextField(formatter);
+        field.setColumns(10);
+        field.setValue(0);
+        return field;
+    }
+    
+
+    private void applyFilter(TableRowSorter<DefaultTableModel> sorter, String searchTxt, String categoryOption, boolean useDate, Object dateVal) {
+        List<RowFilter<Object, Object>> filters = new ArrayList<>();
+
+        if (searchTxt != null && !searchTxt.trim().isEmpty()) {
+            filters.add(RowFilter.regexFilter("(?i)" + searchTxt.trim()));
+        }
+
+        if (categoryOption != null && !categoryOption.equalsIgnoreCase("All") && !categoryOption.equalsIgnoreCase("All Grades")) {
+            filters.add(RowFilter.regexFilter("(?i)^" + categoryOption + "$"));
+        }
+
+        if (useDate && dateVal != null) {
+            SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = dateFmt.format(dateVal);
+            if (!formattedDate.isEmpty()) {
+                filters.add(RowFilter.regexFilter("(?i)" + formattedDate));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(RowFilter.andFilter(filters));
+        }
+    }
+
+    public void updateDashboard(int leavesToday, double productionToday, double totalStock, int pendingQC, int rejectedBatches, int runningMachines, int maintenanceMachines, int workersPresent) {
+        todayLeavesLabel.setText("Today's Green Leaf Collection : " + String.format("%,d", leavesToday) + " kg");
+        todayProductionLabel.setText("Today's Production : " + productionToday + " kg");
+        finalStockLabel.setText("Final Tea Stock : " + totalStock + " kg");
+        pendingQCLabel.setText("Pending QC Batches : " + pendingQC);
+        rejectedBatchLabel.setText("Rejected Batches : " + rejectedBatches);
+        runningMachineLabel.setText("Machines Running : " + runningMachines);
+        maintenanceMachineLabel.setText("Machines Under Maintenance : " + maintenanceMachines);
+        workersPresentLabel.setText("Workers Present : " + workersPresent);
+    }
+
+    public void setSuppliers(List<Supplier> suppliers) {
+        suppCombo.removeAllItems();
+        if (suppliers != null) {
+            for (Supplier s : suppliers) {
+                suppCombo.addItem(s);
+            }
+        }
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        employeeComboBox.removeAllItems();
+        if (employees != null) {
+            for (Employee e : employees) {
+                employeeComboBox.addItem(e);
+            }
+        }
+    }
+
+    public void setMachines(List<Machine> machines) {
+        machineCombo.removeAllItems();
+        if (machines != null) {
+            for (Machine m : machines) {
+                machineCombo.addItem(m);
+            }
+        }
+    }
+
+    public void loadAttendanceData(List<Employee> employees) {
+        attendanceTableModel.setRowCount(0);
+        if (employees != null) {
+            for (Employee e : employees) {
+                attendanceTableModel.addRow(new Object[]{e.getId(), e.getName(), e.getPosition(), "-"});
+            }
+        }
+    }
+
+    public void loadAttendanceHistory(List<Object[]> attendanceList) {
+        attendanceHTableModel.setRowCount(0);
+        if (attendanceList != null) {
+            for (Object[] row : attendanceList) {
+                attendanceHTableModel.addRow(row);
+            }
+        }
+    }
+
+    public void loadMachineData(List<Object[]> machines) {
+        machineManageTableModel.setRowCount(0);
+        if (machines != null) {
+            for (Object[] row : machines) {
+                machineManageTableModel.addRow(row);
+            }
+        }
+    }
+
+    public void loadReceiptRecords(List<Object[]> receipts) {
+        receiptsTableModel.setRowCount(0);
+        if (receipts != null) {
+            for (Object[] row : receipts) {
+                receiptsTableModel.addRow(row);
+            }
+        }
+    }
+
+    public void clearDowntimeForm() {
+        reason.setText("");
+        remarks.setText("");
+    }
+
+    public void clearReceiptForm() {
+        receiptWeight.setValue(0);
+    }
+
+    public void RefreshListener(ActionListener listener) {
+        refreshBtn.addActionListener(listener);
+        
+    }
+    
+    public void LeafCollectionListener(ActionListener listener) {
+        receiptBtn.addActionListener(listener);
+    }
+
+    public void AttendanceListener(ActionListener listener) {
+        attendanceBtn.addActionListener(listener);
+    }
+
+    public void MachineListener(ActionListener listener) {
+        machineSaveBtn.addActionListener(listener);
+    }
+
+    public void addSaveDowntimeListener(ActionListener listener) {
+        saveDown.addActionListener(listener);
+    }
+
+    public Supplier getSupplier() {
+        return (Supplier) suppCombo.getSelectedItem();
+    }
+
+    public int getWeight() {
+        Object val = receiptWeight.getValue();
+        return (val != null) ? ((Number) val).intValue() : 0;
+    }
+
+    public DefaultTableModel getAttendanceTable() {
+        return attendanceTableModel;
+    }
+
+    public DefaultTableModel getMachineTable() {
+        return machineManageTableModel;
+    }
+
     public Machine getSelectedMachine() {
         return (Machine) machineCombo.getSelectedItem();
     }
@@ -531,95 +652,5 @@ public class SupervisorPanel extends JPanel {
 
     public String getRemarks() {
         return remarks.getText().trim();
-    }
-
-    public void addSaveDowntimeListener(ActionListener listener) {
-        saveDown.addActionListener(listener);
-    }
-
-    private JPanel createRecieptRecordsTab() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JPanel containerPanel = new JPanel(new BorderLayout(5, 5));
-        containerPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder("Reciepts Records"),
-            BorderFactory.createEmptyBorder(10, 15, 10, 15)
-        ));
-
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-
-        JTextField searchField = new JTextField(10);
-
-        SpinnerDateModel dateModel = new SpinnerDateModel();
-        JSpinner dateSpinnerFilter = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinnerFilter, "yyyy-MM-dd");
-        dateSpinnerFilter.setEditor(dateEditor);
-        dateEditor.getTextField().setColumns(8);
-
-        JButton filterBtn = new JButton("Filter");
-        JButton refreshBtn = new JButton("Refresh");
-
-        filterPanel.add(new JLabel("Search:"));
-        filterPanel.add(searchField);
-        filterPanel.add(new JLabel("Date:"));
-        filterPanel.add(dateSpinnerFilter);
-        filterPanel.add(filterBtn);
-        filterPanel.add(refreshBtn);
-
-        JTable historyTable = new JTable(recieptsTableModel);
-        historyTable.setRowHeight(24);
-        JScrollPane scrollPane = new JScrollPane(historyTable);
-        
-        Runnable loadData = () -> {
-            recieptsTableModel.setRowCount(0);
-            
-            List<Object[]> reciepts = leafDAO.getAllReciepts();
-            for (Object[] r : reciepts) {
-                recieptsTableModel.addRow(r);
-            }
-        };
-        loadData.run();
-
-        refreshBtn.addActionListener(e -> loadData.run());
-
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(recieptsTableModel);
-        historyTable.setRowSorter(sorter);
-
-        filterBtn.addActionListener(e -> {
-            List<RowFilter<Object, Object>> filters = new ArrayList<>();
-
-            String searchTxt = searchField.getText().trim();
-            if (!searchTxt.isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + searchTxt));
-            }
-
-            SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-            String formattedDate = dateFmt.format(dateSpinnerFilter.getValue());
-            if (!formattedDate.isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + formattedDate));
-            }
-
-            if (filters.isEmpty()) {
-                sorter.setRowFilter(null);
-            } else {
-                sorter.setRowFilter(RowFilter.andFilter(filters));
-            }
-        });
-
-        containerPanel.add(filterPanel, BorderLayout.NORTH);
-        containerPanel.add(scrollPane, BorderLayout.CENTER);
-
-        panel.add(containerPanel, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private void filterTable(TableRowSorter<DefaultTableModel> sorter, String searchText) {
-        if (searchText.isEmpty()) {
-            sorter.setRowFilter(null);
-        } else {
-            sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
-        }
     }
 }

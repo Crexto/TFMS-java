@@ -106,6 +106,11 @@ public class LoginPanel extends JPanel {
 
     }
     
+    public void clearFields() {
+        userField.setText("");
+        passField.setText("");
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

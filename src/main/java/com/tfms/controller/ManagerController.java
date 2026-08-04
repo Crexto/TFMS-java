@@ -11,6 +11,10 @@ import com.tfms.model.dao.ProductionDAO;
 import com.tfms.model.dao.StockHistoryDAO;
 import com.tfms.model.dao.InvoiceDAO;
 import com.tfms.model.dao.InventoryDAO;
+import com.tfms.model.dao.DowntimeDAO;
+import com.tfms.model.dao.LeafCollectionDAO;
+import com.tfms.model.dao.AttendanceDAO;
+import com.tfms.model.dao.MachineDAO;
 import com.tfms.view.ManagerPanel;
 import com.tfms.view.MainAppFrame;
 
@@ -20,6 +24,10 @@ public class ManagerController {
     private final InvoiceDAO invoiceDAO;
     private final StockHistoryDAO ShistoryDAO;
     private final ProductionDAO productionDAO;
+    private final DowntimeDAO downtimeDAO;
+    private final LeafCollectionDAO leafDAO;
+    private final AttendanceDAO attendanceDAO;
+    private final MachineDAO machineDAO;
     private final MainAppFrame mainApp;
 
     public ManagerController(ManagerPanel manaView, MainAppFrame mainApp) {
@@ -28,10 +36,16 @@ public class ManagerController {
         this.invDAO = new InventoryDAO();
         this.invoiceDAO = new InvoiceDAO();
         this.ShistoryDAO = new StockHistoryDAO();
-        this.productionDAO = new ProductionDAO();
-
+        this.productionDAO = new ProductionDAO();        
+        this.downtimeDAO = new DowntimeDAO();
+        this.leafDAO = new LeafCollectionDAO();
+        this.attendanceDAO = new AttendanceDAO();
+        this.machineDAO = new MachineDAO();
+        
         this.manaView.DispatchListener(e -> handleDispatch());
         this.manaView.ProductionListener(e -> handleProduction());
+        this.manaView.RefreshListener(e -> refreshAllTables());
+        refreshAllTables();
     }
 
     private void handleDispatch() {
@@ -77,6 +91,7 @@ public class ManagerController {
             ShistoryDAO.insertRecord(tea.getId(), "Invoice", -quantity, newQuantity, LocalDateTime.now());
 
             JOptionPane.showMessageDialog(manaView, "Dispatch recorded & invoice generated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshAllTables();
         } else {
             JOptionPane.showMessageDialog(manaView, "Failed to process dispatch invoice. Please try again.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -113,8 +128,42 @@ public class ManagerController {
             ShistoryDAO.insertRecord(tea.getId(), "Production", quantity, newQuantity, LocalDateTime.now());
 
             JOptionPane.showMessageDialog(manaView, "Production batch has been added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            refreshAllTables();
         } else {
             JOptionPane.showMessageDialog(manaView, "Failed to add production batch. Please try again.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    
+    private void refreshAllTables() {
+
+        manaView.loadInventory(invDAO.getInventory(), invDAO.getTotal());
+
+        manaView.loadStockHistory(ShistoryDAO.getStockHistory());
+
+        manaView.loadInvoices(invoiceDAO.getAllInvoices());
+
+        manaView.loadProductionHistory(productionDAO.getAllProduction());
+
+        manaView.loadMachineDowntime(downtimeDAO.getAllDowntime());
+        
+        refreshDashboard();
+    }
+    
+    private void refreshDashboard() {
+
+        int leavesToday = leafDAO.getLeavesToday();
+        double productionToday = productionDAO.getProductionToday();
+        double totalStock = invDAO.getTotal();
+
+        int pendingQC = 2;
+        int rejectedBatches = 0;
+
+        int runningMachines = machineDAO.getRunningMachines();
+        int maintenanceMachines = machineDAO.getDownMachines();
+
+        int workersPresent = attendanceDAO.getAllPresent();
+
+        manaView.updateDashboard(leavesToday, productionToday, totalStock, pendingQC, rejectedBatches, runningMachines, maintenanceMachines, workersPresent);
     }
 }
