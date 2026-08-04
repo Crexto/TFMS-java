@@ -31,7 +31,7 @@ CREATE TABLE `attendance` (
   `status` varchar(20) NOT NULL,
   `recorded_by` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `attendance` (
 
 LOCK TABLES `attendance` WRITE;
 /*!40000 ALTER TABLE `attendance` DISABLE KEYS */;
-INSERT INTO `attendance` VALUES (4,'2026-07-31',1,'Absent',4),(5,'2026-07-31',2,'Present',4),(6,'2026-07-31',3,'Absent',4),(7,'2026-08-01',1,'Absent',4),(8,'2026-08-01',2,'Present',4),(9,'2026-08-01',3,'Present',4);
+INSERT INTO `attendance` VALUES (4,'2026-07-31',1,'Absent',4),(5,'2026-07-31',2,'Present',4),(6,'2026-07-31',3,'Absent',4),(7,'2026-08-01',1,'Absent',4),(8,'2026-08-01',2,'Present',4),(9,'2026-08-01',3,'Present',4),(10,'2026-08-04',1,'Absent',4),(11,'2026-08-04',2,'Present',4),(12,'2026-08-04',3,'Absent',4);
 /*!40000 ALTER TABLE `attendance` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,7 +58,7 @@ CREATE TABLE `dispatch_history` (
   `quantity` int DEFAULT NULL,
   `date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,7 +67,7 @@ CREATE TABLE `dispatch_history` (
 
 LOCK TABLES `dispatch_history` WRITE;
 /*!40000 ALTER TABLE `dispatch_history` DISABLE KEYS */;
-INSERT INTO `dispatch_history` VALUES (2,'35',3,1,'2026-07-31 21:53:31'),(3,'hi',1,34,'2026-07-31 22:14:03'),(4,'hi',1,34,'2026-07-31 22:18:27'),(5,'35',1,34,'2026-07-31 22:19:24'),(6,'fa',1,34,'2026-07-31 22:20:07'),(7,'gayer',2,20,'2026-07-31 22:21:17'),(8,'wat',3,200,'2026-08-01 00:43:54');
+INSERT INTO `dispatch_history` VALUES (2,'35',3,1,'2026-07-31 21:53:31'),(3,'hi',1,34,'2026-07-31 22:14:03'),(4,'hi',1,34,'2026-07-31 22:18:27'),(5,'35',1,34,'2026-07-31 22:19:24'),(6,'fa',1,34,'2026-07-31 22:20:07'),(7,'gayer',2,20,'2026-07-31 22:21:17'),(8,'wat',3,200,'2026-08-01 00:43:54'),(9,'ga',3,23,'2026-08-04 08:04:36');
 /*!40000 ALTER TABLE `dispatch_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -121,7 +121,7 @@ CREATE TABLE `employees` (
 
 LOCK TABLES `employees` WRITE;
 /*!40000 ALTER TABLE `employees` DISABLE KEYS */;
-INSERT INTO `employees` VALUES (1,'sunimal','collector'),(2,'namal','sorter'),(3,'amal','gayer');
+INSERT INTO `employees` VALUES (1,'sunimal','collector'),(2,'namal','sorter'),(3,'amal','sorter');
 /*!40000 ALTER TABLE `employees` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -146,7 +146,7 @@ CREATE TABLE `inventory` (
 
 LOCK TABLES `inventory` WRITE;
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
-INSERT INTO `inventory` VALUES (1,'BOP',270),(2,'Dust 1',180),(3,'BOPF',200);
+INSERT INTO `inventory` VALUES (1,'BOP',370),(2,'Dust 1',180),(3,'BOPF',177);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,7 +166,7 @@ CREATE TABLE `leaf_collection` (
   PRIMARY KEY (`id`),
   KEY `supplier_id` (`supplier_id`),
   CONSTRAINT `leaf_collection_ibfk_1` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,8 +175,33 @@ CREATE TABLE `leaf_collection` (
 
 LOCK TABLES `leaf_collection` WRITE;
 /*!40000 ALTER TABLE `leaf_collection` DISABLE KEYS */;
-INSERT INTO `leaf_collection` VALUES (1,1,30.00,'2026-07-30 03:09:52',4),(2,1,4.00,'2026-07-30 03:12:47',4),(3,1,99.00,'2026-07-31 16:15:39',4),(4,1,45.00,'2026-07-31 16:19:27',4),(5,1,34.00,'2026-07-31 19:39:38',4),(6,1,10000.00,'2026-07-31 19:42:41',4);
+INSERT INTO `leaf_collection` VALUES (1,1,30.00,'2026-07-30 03:09:52',4),(2,1,4.00,'2026-07-30 03:12:47',4),(3,1,99.00,'2026-07-31 16:15:39',4),(4,1,45.00,'2026-07-31 16:19:27',4),(5,1,34.00,'2026-07-31 19:39:38',4),(6,1,10000.00,'2026-07-31 19:42:41',4),(7,1,250.00,'2026-08-04 07:40:56',4),(8,1,550.00,'2026-08-04 07:42:23',4),(9,1,23.00,'2026-08-04 07:43:58',4),(10,1,23.00,'2026-08-04 07:44:12',4),(11,1,45.00,'2026-08-04 08:00:32',4);
 /*!40000 ALTER TABLE `leaf_collection` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `leaf_price`
+--
+
+DROP TABLE IF EXISTS `leaf_price`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `leaf_price` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `price` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `leaf_price`
+--
+
+LOCK TABLES `leaf_price` WRITE;
+/*!40000 ALTER TABLE `leaf_price` DISABLE KEYS */;
+/*!40000 ALTER TABLE `leaf_price` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -220,7 +245,7 @@ CREATE TABLE `production` (
   `quantity` int DEFAULT NULL,
   `remarks` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -229,8 +254,62 @@ CREATE TABLE `production` (
 
 LOCK TABLES `production` WRITE;
 /*!40000 ALTER TABLE `production` DISABLE KEYS */;
-INSERT INTO `production` VALUES (1,1,'2026-08-01',4,'g'),(2,1,'2026-08-01',100,'g'),(3,3,'2026-08-01',200,'yay');
+INSERT INTO `production` VALUES (1,1,'2026-08-01',4,'g'),(2,1,'2026-08-01',100,'g'),(3,3,'2026-08-01',200,'yay'),(4,1,'2026-08-04',100,'');
 /*!40000 ALTER TABLE `production` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `quality_inspections`
+--
+
+DROP TABLE IF EXISTS `quality_inspections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `quality_inspections` (
+  `inspection_id` int NOT NULL AUTO_INCREMENT,
+  `collection_id` int NOT NULL,
+  `inspector_id` int NOT NULL,
+  `grade` enum('A','B','C') NOT NULL,
+  `moisture` decimal(5,2) DEFAULT NULL,
+  `coarse_leaf` decimal(5,2) DEFAULT NULL,
+  `remarks` varchar(255) DEFAULT NULL,
+  `status` enum('APPROVED','REJECTED') NOT NULL,
+  `inspection_date` date NOT NULL,
+  PRIMARY KEY (`inspection_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `quality_inspections`
+--
+
+LOCK TABLES `quality_inspections` WRITE;
+/*!40000 ALTER TABLE `quality_inspections` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quality_inspections` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `routes`
+--
+
+DROP TABLE IF EXISTS `routes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `routes` (
+  `route_id` int NOT NULL AUTO_INCREMENT,
+  `route_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`route_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `routes`
+--
+
+LOCK TABLES `routes` WRITE;
+/*!40000 ALTER TABLE `routes` DISABLE KEYS */;
+INSERT INTO `routes` VALUES (2,'abc');
+/*!40000 ALTER TABLE `routes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -248,7 +327,7 @@ CREATE TABLE `stock_history` (
   `balance` int DEFAULT NULL,
   `date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -257,7 +336,7 @@ CREATE TABLE `stock_history` (
 
 LOCK TABLES `stock_history` WRITE;
 /*!40000 ALTER TABLE `stock_history` DISABLE KEYS */;
-INSERT INTO `stock_history` VALUES (1,1,'production',-20,220,'2026-08-01'),(2,1,'Invoice',34,166,'2026-08-01'),(3,1,'Invoice',34,166,'2026-08-01'),(4,1,'Invoice',34,166,'2026-08-01'),(5,1,'Invoice',34,166,'2026-08-01'),(6,2,'Invoice',-20,180,'2026-08-01'),(7,1,'Production',4,170,'2026-08-01'),(8,1,'Production',100,270,'2026-08-01'),(9,3,'Invoice',-200,0,'2026-08-01'),(10,3,'Production',200,200,'2026-08-01');
+INSERT INTO `stock_history` VALUES (1,1,'production',-20,220,'2026-08-01'),(2,1,'Invoice',34,166,'2026-08-01'),(3,1,'Invoice',34,166,'2026-08-01'),(4,1,'Invoice',34,166,'2026-08-01'),(5,1,'Invoice',34,166,'2026-08-01'),(6,2,'Invoice',-20,180,'2026-08-01'),(7,1,'Production',4,170,'2026-08-01'),(8,1,'Production',100,270,'2026-08-01'),(9,3,'Invoice',-200,0,'2026-08-01'),(10,3,'Production',200,200,'2026-08-01'),(11,1,'Production',100,370,'2026-08-04'),(12,3,'Invoice',-23,177,'2026-08-04');
 /*!40000 ALTER TABLE `stock_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,6 +351,8 @@ CREATE TABLE `suppliers` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `contact` varchar(45) DEFAULT NULL,
+  `address` varchar(45) DEFAULT NULL,
+  `route` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -282,7 +363,7 @@ CREATE TABLE `suppliers` (
 
 LOCK TABLES `suppliers` WRITE;
 /*!40000 ALTER TABLE `suppliers` DISABLE KEYS */;
-INSERT INTO `suppliers` VALUES (1,'abc','7454545');
+INSERT INTO `suppliers` VALUES (1,'abc','7454545',NULL,NULL);
 /*!40000 ALTER TABLE `suppliers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -296,13 +377,15 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(45) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `mail` varchar(100) NOT NULL,
   `role` int NOT NULL,
+  `full_name` varchar(45) DEFAULT NULL,
+  `status` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `mail_UNIQUE` (`mail`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -311,8 +394,34 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (2,'c','c','c',0),(3,'d','d','d',3),(4,'e','e','e',1);
+INSERT INTO `users` VALUES (2,'c','c','c',0,NULL,'Active'),(3,'d','d','d',3,NULL,'Active'),(4,'e','e','e',1,NULL,'Active'),(5,'f','f','f',2,'saman','Active');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicles`
+--
+
+DROP TABLE IF EXISTS `vehicles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `vehicles` (
+  `vehicle_id` int NOT NULL AUTO_INCREMENT,
+  `registration_no` varchar(20) NOT NULL,
+  `driver_name` varchar(100) NOT NULL,
+  `capacity` varchar(50) NOT NULL,
+  PRIMARY KEY (`vehicle_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `vehicles`
+--
+
+LOCK TABLES `vehicles` WRITE;
+/*!40000 ALTER TABLE `vehicles` DISABLE KEYS */;
+INSERT INTO `vehicles` VALUES (1,'343','saman','5555');
+/*!40000 ALTER TABLE `vehicles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -324,4 +433,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-08-01  8:00:54
+-- Dump completed on 2026-08-04 19:41:40

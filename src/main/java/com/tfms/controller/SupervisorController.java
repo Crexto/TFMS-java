@@ -77,7 +77,7 @@ public class SupervisorController {
         
         String confirmMessage = String.format(
             "Are you sure you want to submit this record?\n\nSupplier: %s\nGross Weight: %d kg",
-            selectedSupplier.getUsername(), 
+            selectedSupplier.getName(), 
             weight
         );
 
@@ -93,7 +93,7 @@ public class SupervisorController {
             return;
         }
 
-        LeafCollection leaf = new LeafCollection(selectedSupplier.getId(), weight, user.getId());
+        LeafCollection leaf = new LeafCollection(selectedSupplier.getSupplierId(), weight, user.getId());
 
         boolean success = leafDAO.leafCollect(leaf);
 
@@ -235,7 +235,7 @@ public class SupervisorController {
 
         superView.loadReceiptRecords(leafDAO.getAllReciepts());
 
-        superView.setSuppliers(supplierDAO.getAllSuppliers());
+        superView.setSuppliers(supplierDAO.getAll());
         
         superView.setEmployees(employeeDAO.getAllEmployees());
         
