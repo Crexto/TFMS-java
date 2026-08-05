@@ -483,7 +483,7 @@ public class ManagerPanel extends JPanel {
         todayLeavesLabel.setText("Today's Green Leaf Collection : " + String.format("%,d", leavesToday) + " kg");
         todayProductionLabel.setText("Today's Production : " + productionToday + " kg");
         finalStockLabel.setText("Final Tea Stock : " + totalStock + " kg");
-        pendingQCLabel.setText("Pending QC Batches : " + pendingQC);
+        pendingQCLabel.setText("Approved Batches : " + pendingQC);
         rejectedBatchLabel.setText("Rejected Batches : " + rejectedBatches);
         runningMachineLabel.setText("Machines Running : " + runningMachines);
         maintenanceMachineLabel.setText("Machines Under Maintenance : " + maintenanceMachines);

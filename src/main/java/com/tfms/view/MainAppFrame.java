@@ -3,7 +3,7 @@ package com.tfms.view;
 import com.tfms.controller.AdminController;
 import com.tfms.controller.LoginController;
 import com.tfms.controller.ManagerController;
-//import com.tfms.controller.QualityControlController;
+import com.tfms.controller.QualityControlController;
 import com.tfms.controller.SupervisorController;
 
 import javax.swing.*;
@@ -38,7 +38,7 @@ public class MainAppFrame extends JFrame {
         new LoginController(loginPanel, this);
         new SupervisorController(superPanel, this);
         new ManagerController(manaPanel, this);
-//        new QualityControlController(qualityPanel, this);
+        new QualityControlController(qualityPanel, this);
         new AdminController(adminPanel, this);
         
         mainContainer.add(loginPanel, LOGIN_PANEL);        

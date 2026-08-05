@@ -58,6 +58,20 @@ public class User {
         return role;
     }
     
+    public String getRoleS() {
+        switch (role) {
+            case 0: 
+                return "ADMIN";
+            case 1: 
+                return "SUPERVISOR";
+            case 2: 
+                return "QUALITY_CONTROL";
+            case 3: 
+                return "MANAGER";
+        }
+        return "";
+    }
+    
     public void setRoleInt(int role) {
         this.role = role;
     }

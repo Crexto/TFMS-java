@@ -3,11 +3,13 @@ package com.tfms.controller;
 import com.tfms.model.dao.*;
 import com.tfms.model.entity.*;
 import com.tfms.view.AdminPanel;
-
+import java.sql.Date;
 import com.tfms.view.MainAppFrame;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 
 public class AdminController {
 
@@ -15,6 +17,7 @@ public class AdminController {
 
     private final SupplierDAO supplierDAO;
     private final RouteDAO routeDAO;
+    private final LeafPriceDAO leafPriceDAO;
     private final VehicleDAO vehicleDAO;
     private final UserDAO userDAO;
     private MainAppFrame mainApp;
@@ -27,6 +30,7 @@ public class AdminController {
         routeDAO = new RouteDAO();
         vehicleDAO = new VehicleDAO();
         userDAO = new UserDAO();
+        leafPriceDAO = new LeafPriceDAO();
 
         initialize();
 
@@ -40,16 +44,15 @@ public class AdminController {
         loadRoutes();
         loadVehicles();
         loadUsers();
+        loadPriceHistory();
         registerRouteEvents();
         registerVehicleEvents();
+        registerUserEvents();
 
         registerSupplierEvents();
 
     }
 
-    //==================================================
-    // Dashboard
-    //==================================================
 
     private void loadDashboard(){
 
@@ -67,9 +70,6 @@ public class AdminController {
 
     }
 
-    //==================================================
-    // Supplier Events
-    //==================================================
 
     private void registerSupplierEvents(){
 
@@ -81,9 +81,6 @@ public class AdminController {
 
     }
 
-    //==================================================
-    // Load Suppliers
-    //==================================================
 
     private void loadSuppliers(){
 
@@ -113,9 +110,6 @@ public class AdminController {
 
     }
 
-    //==================================================
-    // Add Supplier
-    //==================================================
 
     private void addSupplier(){
 
@@ -169,9 +163,6 @@ public class AdminController {
 
     }
 
-    //==================================================
-    // Update Supplier
-    //==================================================
 
     private void updateSupplier(){
 
@@ -231,10 +222,7 @@ public class AdminController {
 
     }
 
-    //==================================================
-    // Delete Supplier
-    //==================================================
-
+ 
     private void deleteSupplier(){
 
         int row = view.getSupplierTable().getSelectedRow();
@@ -295,6 +283,8 @@ public class AdminController {
     private void loadRoutes() {
 
         DefaultTableModel model = view.getRouteModel();
+        view.getCmbRoute().removeAllItems();
+
         model.setRowCount(0);
 
         List<Route> routes = routeDAO.getAll();
@@ -306,6 +296,10 @@ public class AdminController {
                     r.getRouteName()
             });
 
+        }
+        
+        for (Route route : routes) {
+            view.getCmbRoute().addItem(route.getRouteName());
         }
 
     }
@@ -508,29 +502,66 @@ public class AdminController {
     //==================================================
     // Leaf Price
     //==================================================
+    private void loadPriceHistory() {
+
+        DefaultTableModel model = view.getPriceHistoryModel();
+        model.setRowCount(0);
+
+        List<LeafPrice> prices = leafPriceDAO.getAll();
+
+        for (LeafPrice p : prices) {
+
+            model.addRow(new Object[]{
+                    p.getPriceId(),
+                    p.getPrice(),
+                    p.getStartDate(),
+                    p.getEndDate()
+            });
+        }
+    }
 
     private void updateLeafPrice() {
 
         try {
 
-            double price = Double.parseDouble(
-                    view.getTxtLeafPrice().getText());
+            double price = Double.parseDouble(view.getTxtLeafPrice().getText());
 
-            String date = view.getTxtEffectiveDate().getText();
+            java.util.Date utilDate = (java.util.Date) view.getEffectiveDate().getValue();
 
-            // Example:
-            // leafPriceDAO.update(price, date);
+            java.sql.Date startDate = new java.sql.Date(utilDate.getTime());
 
-            JOptionPane.showMessageDialog(view,
-                    "Leaf price updated.");
+            Date endDate = new Date(startDate.getTime() - (24L * 60 * 60 * 1000));
+
+            leafPriceDAO.updateEndDate(endDate);
+
+            LeafPrice leafPrice = new LeafPrice();
+            leafPrice.setPrice(price);
+            leafPrice.setStartDate(startDate);
+            leafPrice.setEndDate(null);
+
+            if (leafPriceDAO.insert(leafPrice)) {
+
+                JOptionPane.showMessageDialog(view,
+                        "Leaf price updated successfully.");
+
+                view.getTxtLeafPrice().setText("");
+                view.getEffectiveDate().setValue(new java.util.Date());
+
+                loadPriceHistory();
+
+            } else {
+
+                JOptionPane.showMessageDialog(view,
+                        "Failed to update leaf price.");
+
+            }
 
         } catch (Exception ex) {
 
             JOptionPane.showMessageDialog(view,
-                    "Invalid price.");
+                    "Enter a valid price and date.\nDate format: yyyy-mm-dd");
 
         }
-
     }
     
     //==================================================
@@ -563,7 +594,8 @@ public class AdminController {
                     u.getId(),
                     u.getUsername(),
                     u.getFullName(),
-                    u.getRole()
+                    u.getRoleS(),
+                    u.getStatus()
             });
 
         }

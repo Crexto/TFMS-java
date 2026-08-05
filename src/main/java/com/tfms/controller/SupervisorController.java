@@ -11,20 +11,8 @@ import java.util.List;
 import java.sql.Time;
 import java.sql.Date;
 
-import com.tfms.model.entity.LeafCollection;
-import com.tfms.model.entity.User;
-import com.tfms.model.entity.Supplier;
-import com.tfms.model.entity.Attendance;
-import com.tfms.model.entity.Employee;
-import com.tfms.model.entity.Machine;
-import com.tfms.model.dao.ProductionDAO;
-import com.tfms.model.dao.SupplierDAO;
-import com.tfms.model.dao.InventoryDAO;
-import com.tfms.model.dao.DowntimeDAO;
-import com.tfms.model.dao.LeafCollectionDAO;
-import com.tfms.model.dao.AttendanceDAO;
-import com.tfms.model.dao.MachineDAO;
-import com.tfms.model.dao.EmployeeDAO;
+import com.tfms.model.entity.*;
+import com.tfms.model.dao.*;
 import com.tfms.util.UserSession;
 import com.tfms.view.SupervisorPanel;
 import com.tfms.view.MainAppFrame;
@@ -40,6 +28,7 @@ public class SupervisorController {
     private final AttendanceDAO attendanceDAO;
     private final MachineDAO machineDAO;    
     private final EmployeeDAO employeeDAO;
+    private final QualityDAO qualityDAO;
     private final MainAppFrame mainApp;
     
     
@@ -53,6 +42,7 @@ public class SupervisorController {
         this.leafDAO = new LeafCollectionDAO();
         this.attendanceDAO = new AttendanceDAO();
         this.machineDAO = new MachineDAO();
+        this.qualityDAO = new QualityDAO();
         this.employeeDAO = new EmployeeDAO();
         
         this.superView.AttendanceListener(e -> handleAttendance());
@@ -250,8 +240,8 @@ public class SupervisorController {
         double productionToday = productionDAO.getProductionToday();
         double totalStock = invDAO.getTotal();
 
-        int pendingQC = 2;
-        int rejectedBatches = 0;
+        int pendingQC = qualityDAO.getApprovedCount();
+        int rejectedBatches = qualityDAO.getRejectedCount();
 
         int runningMachines = machineDAO.getRunningMachines();
         int maintenanceMachines = machineDAO.getDownMachines();

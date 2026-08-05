@@ -4,17 +4,8 @@ import javax.swing.JOptionPane;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import com.tfms.model.entity.Production;
-import com.tfms.model.entity.Invoice;
-import com.tfms.model.entity.Inventory;
-import com.tfms.model.dao.ProductionDAO;
-import com.tfms.model.dao.StockHistoryDAO;
-import com.tfms.model.dao.InvoiceDAO;
-import com.tfms.model.dao.InventoryDAO;
-import com.tfms.model.dao.DowntimeDAO;
-import com.tfms.model.dao.LeafCollectionDAO;
-import com.tfms.model.dao.AttendanceDAO;
-import com.tfms.model.dao.MachineDAO;
+import com.tfms.model.entity.*;
+import com.tfms.model.dao.*;
 import com.tfms.view.ManagerPanel;
 import com.tfms.view.MainAppFrame;
 
@@ -28,6 +19,7 @@ public class ManagerController {
     private final LeafCollectionDAO leafDAO;
     private final AttendanceDAO attendanceDAO;
     private final MachineDAO machineDAO;
+    private final QualityDAO qualityDAO;
     private final MainAppFrame mainApp;
 
     public ManagerController(ManagerPanel manaView, MainAppFrame mainApp) {
@@ -41,6 +33,7 @@ public class ManagerController {
         this.leafDAO = new LeafCollectionDAO();
         this.attendanceDAO = new AttendanceDAO();
         this.machineDAO = new MachineDAO();
+        this.qualityDAO = new QualityDAO();
         
         this.manaView.DispatchListener(e -> handleDispatch());
         this.manaView.ProductionListener(e -> handleProduction());
@@ -156,8 +149,8 @@ public class ManagerController {
         double productionToday = productionDAO.getProductionToday();
         double totalStock = invDAO.getTotal();
 
-        int pendingQC = 2;
-        int rejectedBatches = 0;
+        int pendingQC = qualityDAO.getApprovedCount();
+        int rejectedBatches = qualityDAO.getRejectedCount();
 
         int runningMachines = machineDAO.getRunningMachines();
         int maintenanceMachines = machineDAO.getDownMachines();

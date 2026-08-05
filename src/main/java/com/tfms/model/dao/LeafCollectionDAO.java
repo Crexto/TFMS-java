@@ -76,5 +76,84 @@ public class LeafCollectionDAO {
         return 0;
     }
     
+    
+    public List<LeafCollection> getPendingCollections() {
+
+        List<LeafCollection> list = new ArrayList<>();
+
+        String sql = """
+                SELECT lc.*, s.name
+                FROM leaf_collection lc
+                JOIN suppliers s
+                    ON lc.supplier_id = s.id
+                WHERE lc.id NOT IN (
+                    SELECT collection_id
+                    FROM quality_inspections
+                )
+                ORDER BY lc.collection_date DESC
+                """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                LeafCollection c = new LeafCollection();
+
+                c.setId(rs.getInt("id"));
+                c.setSupplier(rs.getInt("supplier_id"));
+                c.setSupplierName(rs.getString("name"));
+                c.setCollectionDate(rs.getDate("collection_date"));
+                c.setWeight(rs.getInt("gross_weight"));
+
+                list.add(c);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    
+    public LeafCollection getById(int id) {
+
+        String sql = """
+                SELECT lc.*, s.name
+                FROM leaf_collection lc
+                JOIN suppliers s
+                    ON lc.supplier_id = s.id
+                WHERE lc.id = ?
+                """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                LeafCollection c = new LeafCollection();
+
+                c.setId(rs.getInt("id"));
+                c.setSupplier(rs.getInt("supplier_id"));
+                c.setSupplierName(rs.getString("name"));
+                c.setCollectionDate(rs.getDate("collection_date"));
+                c.setWeight(rs.getInt("gross_weight"));
+
+                return c;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    
 
 }

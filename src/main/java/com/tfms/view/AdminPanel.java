@@ -336,40 +336,69 @@ public class AdminPanel extends JPanel {
     //===================================================
 
     private JTextField txtLeafPrice;
-    private JTextField txtEffectiveDate;
+    private JSpinner spnStartDate;
 
-    private JPanel createLeafPriceTab(){
+    private JTable priceHistoryTable;
+    private DefaultTableModel priceHistoryModel;
 
-        JPanel panel = new JPanel(new GridBagLayout());
+    private JPanel createLeafPriceTab() {
+
+        JPanel panel = new JPanel(new BorderLayout(10,10));
         panel.setBorder(BorderFactory.createTitledBorder("Leaf Price Management"));
+
+        // =========================
+        // Form
+        // =========================
+        JPanel form = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8,8,8,8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         txtLeafPrice = new JTextField(15);
-        txtEffectiveDate = new JTextField(15);
-        
+        spnStartDate = new JSpinner(new SpinnerDateModel());
+
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(spnStartDate, "yyyy-MM-dd");
+        spnStartDate.setEditor(editor);
+
         btnUpdatePrice = new JButton("Update Price");
 
-        gbc.gridx=0;
-        gbc.gridy=0;
-        panel.add(new JLabel("Price Per Kg"), gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        form.add(new JLabel("Price Per Kg"), gbc);
 
-        gbc.gridx=1;
-        panel.add(txtLeafPrice, gbc);
+        gbc.gridx = 1;
+        form.add(txtLeafPrice, gbc);
 
-        gbc.gridx=0;
-        gbc.gridy=1;
-        panel.add(new JLabel("Effective Date"), gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        form.add(new JLabel("Effective Date"), gbc);
 
-        gbc.gridx=1;
-        panel.add(txtEffectiveDate, gbc);
+        gbc.gridx = 1;
+        form.add(spnStartDate, gbc);
 
-        gbc.gridx=0;
-        gbc.gridy=2;
-        gbc.gridwidth=2;
-        panel.add(btnUpdatePrice, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        form.add(btnUpdatePrice, gbc);
+
+        panel.add(form, BorderLayout.NORTH);
+
+        // =========================
+        // Price History Table
+        // =========================
+        priceHistoryModel = new DefaultTableModel(
+                new String[]{
+                        "ID",
+                        "Price (LKR)",
+                        "Start Date",
+                        "End Date"
+                }, 0);
+
+        priceHistoryTable = new JTable(priceHistoryModel);
+        priceHistoryTable.setRowHeight(25);
+
+        panel.add(new JScrollPane(priceHistoryTable), BorderLayout.CENTER);
 
         return panel;
     }
@@ -457,7 +486,8 @@ public class AdminPanel extends JPanel {
                         "User ID",
                         "Username",
                         "Full Name",
-                        "Role"
+                        "Role",
+                        "Status"
                 },0);
 
         userTable = new JTable(userModel);
@@ -487,7 +517,22 @@ public class AdminPanel extends JPanel {
     //===================================================
     // Getters
     //===================================================
-    
+    public JTextField getTxtLeafPrice() {
+        return txtLeafPrice;
+    }
+
+    public JSpinner getEffectiveDate() {
+        return spnStartDate;
+    }
+
+    public JButton getBtnUpdatePrice() {
+        return btnUpdatePrice;
+    }
+
+    public DefaultTableModel getPriceHistoryModel() {
+        return priceHistoryModel;
+    }
+
     public JButton getBtnSupplierAdd() {
         return btnSupplierAdd;
     }
@@ -536,9 +581,6 @@ public class AdminPanel extends JPanel {
         return btnDeleteUser;
     }
 
-    public JButton getBtnUpdatePrice() {
-        return btnUpdatePrice;
-    }
 
     public JTable getSupplierTable(){ return supplierTable; }
     public JTable getRouteTable(){ return routeTable; }
@@ -561,9 +603,6 @@ public class AdminPanel extends JPanel {
     public JTextField getTxtVehicleNo(){ return txtVehicleNo; }
     public JTextField getTxtDriver(){ return txtDriver; }
     public JTextField getTxtCapacity(){ return txtCapacity; }
-
-    public JTextField getTxtLeafPrice(){ return txtLeafPrice; }
-    public JTextField getTxtEffectiveDate(){ return txtEffectiveDate; }
 
     public JTextField getTxtUsername(){ return txtUsername; }
     public JPasswordField getTxtPassword(){ return txtPassword; }

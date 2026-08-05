@@ -40,7 +40,7 @@ public class UserDAO {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("full_name"));
-                user.setRole(rs.getString("role"));
+                user.setRoleInt(rs.getInt("role"));
                 user.setStatus(rs.getString("status"));
 
                 users.add(user);

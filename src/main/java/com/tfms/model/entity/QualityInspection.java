@@ -1,50 +1,121 @@
 package com.tfms.model.entity;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 public class QualityInspection {
+
     private int inspectionId;
-    private String batchNumber;
+    private int collectionId;
     private int inspectorId;
-    private Timestamp inspectionDate;
-    private double moistureContent;
+
+    private String supplierName;
+    private double weight;
+    private String inspectorName;
+
     private String grade;
-    private String status;
+    private double moisture;
+    private double coarseLeaf;
     private String remarks;
+    private String status;
 
-    public QualityInspection() {}
+    private Date inspectionDate;
 
-    public QualityInspection(String batchNumber, int inspectorId, double moistureContent, String grade, String status, String remarks) {
-        this.batchNumber = batchNumber;
+    public QualityInspection() {
+    }
+
+    public int getInspectionId() {
+        return inspectionId;
+    }
+
+    public void setInspectionId(int inspectionId) {
+        this.inspectionId = inspectionId;
+    }
+
+    public int getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(int collectionId) {
+        this.collectionId = collectionId;
+    }
+
+    public int getInspectorId() {
+        return inspectorId;
+    }
+
+    public void setInspectorId(int inspectorId) {
         this.inspectorId = inspectorId;
-        this.moistureContent = moistureContent;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public String getInspectorName() {
+        return inspectorName;
+    }
+
+    public void setInspectorName(String inspectorName) {
+        this.inspectorName = inspectorName;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
         this.grade = grade;
-        this.status = status;
+    }
+
+    public double getMoisture() {
+        return moisture;
+    }
+
+    public void setMoisture(double moisture) {
+        this.moisture = moisture;
+    }
+
+    public double getCoarseLeaf() {
+        return coarseLeaf;
+    }
+
+    public void setCoarseLeaf(double coarseLeaf) {
+        this.coarseLeaf = coarseLeaf;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
         this.remarks = remarks;
     }
 
-    // Getters and Setters
-    public int getInspectionId() { return inspectionId; }
-    public void setInspectionId(int inspectionId) { this.inspectionId = inspectionId; }
+    public String getStatus() {
+        return status;
+    }
 
-    public String getBatchNumber() { return batchNumber; }
-    public void setBatchNumber(String batchNumber) { this.batchNumber = batchNumber; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-    public int getInspectorId() { return inspectorId; }
-    public void setInspectorId(int inspectorId) { this.inspectorId = inspectorId; }
+    public Date getInspectionDate() {
+        return inspectionDate;
+    }
 
-    public Timestamp getInspectionDate() { return inspectionDate; }
-    public void setInspectionDate(Timestamp inspectionDate) { this.inspectionDate = inspectionDate; }
-
-    public double getMoistureContent() { return moistureContent; }
-    public void setMoistureContent(double moistureContent) { this.moistureContent = moistureContent; }
-
-    public String getGrade() { return grade; }
-    public void setGrade(String grade) { this.grade = grade; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public String getRemarks() { return remarks; }
-    public void setRemarks(String remarks) { this.remarks = remarks; }
+    public void setInspectionDate(Date inspectionDate) {
+        this.inspectionDate = inspectionDate;
+    }
 }

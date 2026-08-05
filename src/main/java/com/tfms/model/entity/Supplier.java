@@ -59,4 +59,9 @@ public class Supplier {
     public void setRoute(String route) {
         this.route = route;
     }
+    
+    @Override
+    public String toString() {
+        return name; 
+    }
 }
